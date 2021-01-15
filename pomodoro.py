@@ -1,6 +1,8 @@
 from PyQt5.QtCore import QTime, QTimer
 from PyQt5.QtWidgets import QSizePolicy, QWidget, QMainWindow, QVBoxLayout, QGroupBox, QHBoxLayout, QSpinBox, QLabel, QComboBox, QLCDNumber, QPushButton, QSystemTrayIcon, QMenu, QApplication
 from PyQt5.QtGui import QIcon
+from qdarkstyle import load_stylesheet
+
 
 from enum import Enum
 from random import choice
@@ -199,14 +201,14 @@ class MainWindow(QMainWindow):
         self.otherGroupBoxLayout.addWidget(self.modeLabel)
         self.otherGroupBoxLayout.addWidget(self.modeComboBox)
         #LCDDISPLAY
+        self.lcdDisplayGroupBox = QGroupBox("Time")
+        self.lcdDisplayGroupBoxLayout = QHBoxLayout(self.lcdDisplayGroupBox)
+        self.lcdDisplayGroupBox.setLayout(self.lcdDisplayGroupBoxLayout)
         self.timeDisplay = QLCDNumber(8, sizePolicy=self.size_policy)
         self.timeDisplay.setFixedHeight(100)
         self.timeDisplay.display("00:00:00")
-        self.timeDisplay.setStyleSheet("""
-        border: 2px solid;
-        background-color: rgb(168, 198, 78);
-        color: rgb(0, 0, 0);
-        """)
+        self.lcdDisplayGroupBoxLayout.addWidget(self.timeDisplay)
+
         #BUTTONS
         self.buttonWidget = QWidget()
         self.buttonWidgetLayout = QHBoxLayout(self.buttonWidget)
@@ -222,23 +224,19 @@ class MainWindow(QMainWindow):
         self.centralWidgetLayout.addWidget(self.workGroupBox)
         self.centralWidgetLayout.addWidget(self.restGroupBox)
         self.centralWidgetLayout.addWidget(self.otherGroupBox)
-        self.centralWidgetLayout.addWidget(self.timeDisplay)
+        self.centralWidgetLayout.addWidget(self.lcdDisplayGroupBox)
         self.centralWidgetLayout.addWidget(self.buttonWidget)
     
     def make_round_button(self, path, text, disabled=True):
         button = QPushButton(text, sizePolicy = self.size_policy)
-        #button.setIcon(QIcon(path))
-        #button.setStyleSheet("""border-radius : 200;  
-        #                      border : 0px solid black""") 
         button.setDisabled(disabled)
         return button
-
 
 
     def setup_trayicon(self):
         self.trayIcon = QSystemTrayIcon(QIcon("icons/tomato.png"))
         self.trayIcon.setContextMenu(QMenu())
-        self.quitAction = self.trayIcon.contextMenu().addAction(QIcon("icons/exit.png"), "Exit", self.exit)
+        self.quitAction = self.trayIcon.contextMenu().addAction(QIcon("icons/exit.png"), "Quit", self.exit)
         self.quitAction.triggered.connect(self.exit)
         self.trayIcon.activated.connect(self.onActivate) 
         self.trayIcon.show()
@@ -273,5 +271,6 @@ def make_app():
 if __name__ == "__main__":
     import sys
     app = make_app()
+    app.setStyleSheet(load_stylesheet(qt_api="pyqt5"))
     mainWindow = MainWindow()
     sys.exit(app.exec_())
