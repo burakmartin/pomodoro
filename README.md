@@ -1,5 +1,5 @@
 # pomodoro
-A small pomodoro GUI for Windows created in PyQt5.
+A small pomodoro GUI for Windows/Linux created in PyQt5.
 
 
 
