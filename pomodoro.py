@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from PyQt5.QtCore import QTime, QTimer
 from PyQt5.QtWidgets import QSizePolicy, QWidget, QMainWindow, QVBoxLayout, QGroupBox, QHBoxLayout, QSpinBox, QLabel, QComboBox, QLCDNumber, QPushButton, QSystemTrayIcon, QMenu, QApplication
 from PyQt5.QtGui import QIcon
