@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
-from PyQt5.QtCore import QTime, QTimer
-from PyQt5.QtWidgets import QSizePolicy, QWidget, QMainWindow, QVBoxLayout, QGroupBox, QHBoxLayout, QSpinBox, QLabel, QComboBox, QLCDNumber, QPushButton, QSystemTrayIcon, QMenu, QApplication
+from PyQt5.QtCore import QTime, QTimer, Qt
+from PyQt5.QtWidgets import QSizePolicy, QWidget, QMainWindow, QVBoxLayout, QGroupBox, QHBoxLayout, QSpinBox, QLabel,\
+                            QComboBox, QLCDNumber, QPushButton, QSystemTrayIcon, QMenu, QApplication, QTabWidget,\
+                                 QTextEdit, QToolButton, QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
 from PyQt5.QtGui import QIcon
 from qdarkstyle import load_stylesheet
 
@@ -39,6 +41,10 @@ class MainWindow(QMainWindow):
         self.currentRepetitions = 0
         self.show()
 
+    def leaveEvent(self, event):
+        super(MainWindow, self).leaveEvent(event)
+        self.tasksTableWidget.clearSelection()
+
 
     def reset_time(self):
         self.time = QTime(0,0,0,0)
@@ -72,6 +78,15 @@ class MainWindow(QMainWindow):
             self.reset_time()
         except:
             pass
+
+    def maybe_start_timer(self):
+        if self.currentRepetitions != self.maxRepetitions:
+            self.start_timer()
+            started = True
+        else:
+            self.currentRepetitions = 0
+            started = False
+        return started
     
     def update_work_end_time(self):
         self.workEndTime = QTime(self.workHoursSpinBox.value(), self.workMinutesSpinBox.value(), self.workSecondsSpinBox.value())
@@ -111,26 +126,37 @@ class MainWindow(QMainWindow):
         if self.maxRepetitions > 0:
             self.currentRepetitions +=1
             
-    def maybe_start_timer(self):
-        if self.currentRepetitions != self.maxRepetitions:
-            self.start_timer()
-            started = True
-        else:
-            self.currentRepetitions = 0
-            started = False
-        return started
+
+    def insert_task(self):
+        taskDescription = self.taskTextEdit.toPlainText()
+        if taskDescription:
+            rowCount = self.tasksTableWidget.rowCount()
+            self.tasksTableWidget.setRowCount(rowCount + 1)
+            self.tasksTableWidget.setItem(rowCount, 0, QTableWidgetItem(taskDescription))
+            self.tasksTableWidget.resizeRowsToContents()
+            self.taskTextEdit.clear()
+
+    def delete_task(self):
+        selectedIndexes = self.tasksTableWidget.selectedIndexes()
+        if selectedIndexes:
+            self.tasksTableWidget.removeRow(selectedIndexes[0].row())
         
-            
+    def mark_task_as_finished(self, row, col):
+        item = self.tasksTableWidget.item(row, col)
+        font = self.tasksTableWidget.item(row, col).font()
+        font.setStrikeOut(False if item.font().strikeOut() else True)
+        item.setFont(font)
+   
     def display_time(self):
         self.timeDisplay.display(self.time.toString("hh:mm:ss"))
 
     def show_window_message(self, status):
         if status is Status.workFinished:
-            self.trayIcon.showMessage("Work finished", choice(work_finished_phrases), QIcon("icons/tomato.png"))
+            self.trayIcon.showMessage("Break", choice(work_finished_phrases), QIcon("icons/tomato.png"))
         elif status is Status.restFinished:
-           self.trayIcon.showMessage("Rest finished", choice(rest_finished_phrases), QIcon("icons/tomato.png"))
+           self.trayIcon.showMessage("Work", choice(rest_finished_phrases), QIcon("icons/tomato.png"))
         else:
-            self.trayIcon.showMessage("Pomodoro finished", choice(pomodoro_finished_phrases), QIcon("icons/tomato.png"))
+            self.trayIcon.showMessage("Finished", choice(pomodoro_finished_phrases), QIcon("icons/tomato.png"))
             self.stopButton.click()
 
 
@@ -161,14 +187,21 @@ class MainWindow(QMainWindow):
         self.modeComboBox.currentTextChanged.connect(self.update_current_mode)
         self.repetitionsSpinBox.valueChanged.connect(self.update_max_repetitions)
 
+        self.acceptTaskButton.pressed.connect(self.insert_task)
+        self.deleteTaskButton.pressed.connect(self.delete_task)
+
+        self.tasksTableWidget.cellDoubleClicked.connect(self.mark_task_as_finished)
+
 
     def setup_ui(self):
         self.size_policy = sizePolicy=QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        #CENTRALWIDGET
-        self.centralWidget = QWidget(self)
-        self.setCentralWidget(self.centralWidget)
-        self.centralWidgetLayout = QVBoxLayout(self.centralWidget)
-        self.centralWidget.setLayout(self.centralWidgetLayout)
+        #TABWIDGET
+        self.tabWidget = QTabWidget()
+        
+        self.pomodoroWidget = QWidget(self)
+
+        self.pomodoroWidgetLayout = QVBoxLayout(self.pomodoroWidget)
+        self.pomodoroWidget.setLayout(self.pomodoroWidgetLayout)
         # work
         self.workGroupBox = QGroupBox("Work")
         self.workGroupBoxLayout = QHBoxLayout(self.workGroupBox)
@@ -223,11 +256,47 @@ class MainWindow(QMainWindow):
         self.buttonWidgetLayout.addWidget(self.stopButton)
 
         #CENTRALWIDGET
-        self.centralWidgetLayout.addWidget(self.workGroupBox)
-        self.centralWidgetLayout.addWidget(self.restGroupBox)
-        self.centralWidgetLayout.addWidget(self.otherGroupBox)
-        self.centralWidgetLayout.addWidget(self.lcdDisplayGroupBox)
-        self.centralWidgetLayout.addWidget(self.buttonWidget)
+        self.pomodoroWidgetLayout.addWidget(self.workGroupBox)
+        self.pomodoroWidgetLayout.addWidget(self.restGroupBox)
+        self.pomodoroWidgetLayout.addWidget(self.otherGroupBox)
+        self.pomodoroWidgetLayout.addWidget(self.lcdDisplayGroupBox)
+        self.pomodoroWidgetLayout.addWidget(self.buttonWidget)
+        #CREATE TASKS TAB
+        self.tasksWidget = QWidget(self.tabWidget)
+        self.tasksWidgetLayout = QVBoxLayout(self.tasksWidget)
+        self.tasksWidget.setLayout(self.tasksWidgetLayout)
+        self.inputWidget = QWidget()
+        self.inputWidget.setFixedHeight(50)
+        self.inputWidgetLayout = QHBoxLayout(self.inputWidget)
+        self.inputWidgetLayout.setContentsMargins(0,0,0,0)
+        self.inputWidget.setLayout(self.inputWidgetLayout)
+        self.taskTextEdit = QTextEdit(placeholderText = "Describe your task briefly.", undoRedoEnabled=True)
+        self.inputButtonContainer = QWidget()
+        self.inputButtonContainerLayout = QVBoxLayout(self.inputButtonContainer)
+        self.inputButtonContainerLayout.setContentsMargins(0,0,0,0)
+        self.inputButtonContainer.setLayout(self.inputButtonContainerLayout)
+        self.acceptTaskButton = QToolButton(icon=QIcon("icons/check.png"))
+        self.deleteTaskButton = QToolButton(icon=QIcon("icons/trash.png"))
+        self.inputButtonContainerLayout.addWidget(self.acceptTaskButton)
+        self.inputButtonContainerLayout.addWidget(self.deleteTaskButton)
+
+        self.inputWidgetLayout.addWidget(self.taskTextEdit)
+        self.inputWidgetLayout.addWidget(self.inputButtonContainer)
+        self.tasksTableWidget = QTableWidget(0, 1)
+        self.tasksTableWidget.setHorizontalHeaderLabels(["Tasks"])
+        self.tasksTableWidget.horizontalHeader().setStretchLastSection(True)
+        self.tasksTableWidget.verticalHeader().setVisible(False)
+        self.tasksTableWidget.setWordWrap(True)
+        self.tasksTableWidget.setTextElideMode(Qt.ElideNone)
+        self.tasksTableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tasksTableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+
+        self.tasksWidgetLayout.addWidget(self.inputWidget)
+        self.tasksWidgetLayout.addWidget(self.tasksTableWidget)
+        #ADD TASKS
+        self.timerTab = self.tabWidget.addTab(self.pomodoroWidget, QIcon("icons/pomodoro.png"), "Timer")
+        self.tasksTab = self.tabWidget.addTab(self.tasksWidget, QIcon("icons/pomodoro.png"), "Tasks")
+        self.setCentralWidget(self.tabWidget)
     
     def make_round_button(self, path, text, disabled=True):
         button = QPushButton(text, sizePolicy = self.size_policy)
