@@ -294,8 +294,8 @@ class MainWindow(QMainWindow):
         self.tasksWidgetLayout.addWidget(self.inputWidget)
         self.tasksWidgetLayout.addWidget(self.tasksTableWidget)
         #ADD TASKS
-        self.timerTab = self.tabWidget.addTab(self.pomodoroWidget, QIcon("icons/pomodoro.png"), "Timer")
-        self.tasksTab = self.tabWidget.addTab(self.tasksWidget, QIcon("icons/pomodoro.png"), "Tasks")
+        self.timerTab = self.tabWidget.addTab(self.pomodoroWidget, QIcon("icons/timer.png"), "Timer")
+        self.tasksTab = self.tabWidget.addTab(self.tasksWidget, QIcon("icons/tasks.png"), "Tasks")
         self.setCentralWidget(self.tabWidget)
     
     def make_round_button(self, path, text, disabled=True):
