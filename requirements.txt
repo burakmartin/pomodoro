@@ -1,2 +1,2 @@
-PyQt5==5.15.0
-QDarkStyle==2.8.1
+PyQt5>=5.15.0
+QDarkStyle>=2.8.1
