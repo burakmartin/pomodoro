@@ -12,7 +12,7 @@ Simply run python3 pomodoro.py to start the program.
 You can create a executable file with pyinstaller. For that "pip install pyinstaller" and then run pyinstaller pomodoro.spec.
 This will create a build and a dist folder. The dist folder will contain a pomodoro folder where the executable is located. Now you're
 able to run the application by running pomodoro.exe
-Alternatively install the application from the releases tab. The installer is created with InstallForge which just bundles up
+Alternatively install the application from the <a href=https://github.com/burakmartin/pomodoro/releases>releases</a> tab. The installer is created with InstallForge which just bundles up
 the folder created with pyinstaller letting you choose a installation path. It also comes with an uninstaller.
 
 
