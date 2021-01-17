@@ -54,12 +54,12 @@ class MainWindow(QMainWindow):
         settings = QSettings()
         self.configParser = ConfigParser()
         self.configParser.read("config.ini")
-        self.workEndTime    = QTime(settings.value(self.configParser["SETTINGS"]["WorkHours"],   0), 
-                                    settings.value(self.configParser["SETTINGS"]["WorkMinutes"], 25), 
-                                    settings.value(self.configParser["SETTINGS"]["WorkSeconds"], 0))
-        self.restEndTime    = QTime(settings.value(self.configParser["SETTINGS"]["RestHours"],   0), 
-                                    settings.value(self.configParser["SETTINGS"]["RestMinutes"], 5), 
-                                    settings.value(self.configParser["SETTINGS"]["RestSeconds"], 0))
+        self.workEndTime        = QTime( settings.value(self.configParser["SETTINGS"]["WorkHours"],   0), 
+                                         settings.value(self.configParser["SETTINGS"]["WorkMinutes"], 25), 
+                                         settings.value(self.configParser["SETTINGS"]["WorkSeconds"], 0))
+        self.restEndTime        = QTime( settings.value(self.configParser["SETTINGS"]["RestHours"],   0), 
+                                         settings.value(self.configParser["SETTINGS"]["RestMinutes"], 5), 
+                                         settings.value(self.configParser["SETTINGS"]["RestSeconds"], 0))
         self.timeFormat         = "hh:mm:ss"
         self.time               = QTime(0,0,0,0)
         self.workTime           = QTime(0,0,0,0)
@@ -101,13 +101,13 @@ class MainWindow(QMainWindow):
         self.tasksTableWidget.cellDoubleClicked.connect(self.mark_task_as_finished)
 
     def setup_ui(self):
-        self.size_policy = sizePolicy=QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding) 
+        self.size_policy   = sizePolicy=QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding) 
         """ Create tabwidget """
-        self.tabWidget = QTabWidget()
+        self.tabWidget     = QTabWidget()
         """ Create tab widgets """
-        timerWidget      = self.setup_timer_tab()
-        tasksWidget      = self.setup_tasks_tab()
-        statisticsWidget = self.setup_statistics_tab()
+        timerWidget        = self.setup_timer_tab()
+        tasksWidget        = self.setup_tasks_tab()
+        statisticsWidget   = self.setup_statistics_tab()
         """ add tab widgets to tabwidget"""
         self.timerTab      = self.tabWidget.addTab(timerWidget, QIcon("icons/timer.png"), "Timer")
         self.tasksTab      = self.tabWidget.addTab(tasksWidget, QIcon("icons/tasks.png"), "Tasks")
