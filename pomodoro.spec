@@ -15,7 +15,6 @@ excluded_binaries = [
         'ucrtbase.dll']
 
 data_list = [('.\\pomodoro\\icons', 'icons\\'), 
-             ('.\\pomodoro\\config.ini', '.'), 
              ('.\\pomodoro\\const.py', '.'), 
              ('.\\LICENSE', '.'),
              ('.\\AUTHORS', '.'),
