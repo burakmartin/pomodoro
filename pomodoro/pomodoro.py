@@ -116,12 +116,8 @@ class MainWindow(QMainWindow):
         tasksWidget = self.setupTasksTab()
         statisticsWidget = self.setupStatisticsTab()
         """ add tab widgets to tabwidget"""
-        self.timerTab = self.tabWidget.addTab(
-            timerWidget, makeIcon("timer"), "Timer"
-        )
-        self.tasksTab = self.tabWidget.addTab(
-            tasksWidget, makeIcon("tasks"), "Tasks"
-        )
+        self.timerTab = self.tabWidget.addTab(timerWidget, makeIcon("timer"), "Timer")
+        self.tasksTab = self.tabWidget.addTab(tasksWidget, makeIcon("tasks"), "Tasks")
         self.statisticsTab = self.tabWidget.addTab(
             statisticsWidget, makeIcon("statistics"), "Statistics"
         )
@@ -521,6 +517,7 @@ def makeIcon(name, end="png"):
     iconPath = iconPath.filePath(f"{name}.{end}")
     return QIcon(iconPath)
 
+
 def makeApp():
     try:
         from PyQt5.QtWinExtras import QtWin
@@ -536,8 +533,6 @@ def makeApp():
     app.setOrganizationName("Burak Martin")
     app.setOrganizationDomain("https://github.com/burakmartin")
     return app
-
-
 
 
 if __name__ == "__main__":
