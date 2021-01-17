@@ -1,4 +1,4 @@
-# pomodoro
+# Pomodoro
 A small pomodoro GUI for Windows/Linux created with PyQt5.
 
 
@@ -29,12 +29,13 @@ To quit it, right click the tomato icon in your traysystem and press the quit bu
 </p>
 
 # Install/Usage
+This section gives an overview on how to use the program.
 
 ## General
 Simply run python3 pomodoro.py to run the programm.
 
 ## Windows
-You create a executable file with pyinstaller. For that "pip install pyinstaller" and then run pyinstaller pomodoro.spec.
+You can create a executable file with pyinstaller. For that "pip install pyinstaller" and then run pyinstaller pomodoro.spec.
 This will create a build and a dist folder. The dist folder will contain a pomodoro folder where the executable is located. Now you're
 able to run the application by running pomodoro.exe
 
