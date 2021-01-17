@@ -51,7 +51,7 @@ This section gives an overview on how to use the program.
 
     pyinstaller pomodoro.spec
 
-This will create a build and a dist folder. The dist folder will contain a pomodoro folder where the executable is located. Now you're
-able to run the application by executing pomodoro.exe
+This will create a "build" and a "dist" folder. The "dist" folder will contain a pomodoro folder where the executable is located. Now you're
+able to run the application by executing "pomodoro.exe"
 Alternatively install the application from the <a href=https://github.com/burakmartin/pomodoro/releases>releases</a> tab. The installer is created with InstallForge which just bundles up
-the folder created with pyinstaller letting you choose a installation path. It also comes with an uninstaller.
+the folder created with pyinstaller and lets you choose an installation path. It also comes with an uninstaller.
