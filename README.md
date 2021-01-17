@@ -2,6 +2,22 @@
 A small pomodoro GUI for Windows/Linux created with PyQt5.
 
 
+## Install/Usage
+This section gives an overview on how to use the program.
+
+### General
+Simply run python3 pomodoro.py to run the programm.
+
+### Windows
+You can create a executable file with pyinstaller. For that "pip install pyinstaller" and then run pyinstaller pomodoro.spec.
+This will create a build and a dist folder. The dist folder will contain a pomodoro folder where the executable is located. Now you're
+able to run the application by running pomodoro.exe
+Alternatively install the application from the releases tab. The installer is created with InstallForge which just bundles up
+the folder created with pyinstaller letting you choose a installation path. It also comes with an uninstaller.
+
+
+## Features
+
 The "Timer" tab allows you to set your desired work and rest times aswell as other settings. Starting, pausing and reseting the timer can also be done in this tab. Settings made in this tab, except repetitions and mode, are saved across multiple instances.
 <p align="center">
   <img src="images/screenshot_1.png">
@@ -27,17 +43,3 @@ To quit it, right click the tomato icon in your traysystem and press the quit bu
 <p align="center">
   <img src="images/screenshot_5.png">
 </p>
-
-# Install/Usage
-This section gives an overview on how to use the program.
-
-## General
-Simply run python3 pomodoro.py to run the programm.
-
-## Windows
-You can create a executable file with pyinstaller. For that "pip install pyinstaller" and then run pyinstaller pomodoro.spec.
-This will create a build and a dist folder. The dist folder will contain a pomodoro folder where the executable is located. Now you're
-able to run the application by running pomodoro.exe
-
-Alternatively install the application from the releases tab. The installer is created with InstallForge which just bundles up
-the folder created with pyinstaller letting you choose a installation path. It also comes with an uninstaller.
