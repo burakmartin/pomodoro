@@ -21,3 +21,9 @@ The application currently uses your systems own notification system. Make sure t
 <p align="center">
   <img src="images/screenshot_4.png">
 </p>
+
+The program lives inside your systems traysystem, so "X"-ing out of the GUI will not quit the programm, it will rather hide itself so that it doesnt occupy any space in your taskbar.
+To quit it, right click the tomato icon in your traysystem and press the quit button.
+<p align="center">
+  <img src="images/screenshot_5.png">
+</p>

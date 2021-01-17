@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 APP_ID = 'brkmrt.pomodoro'
 work_finished_phrases = [   "Its time to rest, but don't 😴...", 
                             "Take a rest and grab some 💧!", 
