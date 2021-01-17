@@ -16,23 +16,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-
-
-from PyQt5.QtCore import QTime, QTimer, Qt
+from PyQt5.QtCore import QTime, QTimer, Qt, QSettings
 from PyQt5.QtWidgets import QSizePolicy, QWidget, QMainWindow, QVBoxLayout, QGroupBox, QHBoxLayout, QSpinBox, QLabel,\
                             QComboBox, QLCDNumber, QPushButton, QSystemTrayIcon, QMenu, QApplication, QTabWidget,\
-                                 QTextEdit, QToolButton, QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
+                                 QTextEdit, QToolButton, QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView, QFormLayout
 from PyQt5.QtGui import QIcon
 from qdarkstyle import load_stylesheet
 
-
 from enum import Enum
 from random import choice
+from const import *
 
-APP_ID = 'brkmrt.pomodoro'
-work_finished_phrases = ["Its time to rest, but don't 😴...", "Take a rest and grab some 💧", "Rest a bit, you deserve it!🤓", "Okay...I Guess you can take a rest now...🙄"]
-rest_finished_phrases = ["Enough rest, go back to work 💻", "Get back to work. You've got this! 😤", "Its time to work. You can do it!🧠", "You got this, get back to work 📚"]
-pomodoro_finished_phrases = ["Good job, im proud of you!😊"]
 
 class Mode(Enum):
     work = 1,
@@ -48,12 +42,17 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__()
+        settings = QSettings()
         self.setup_trayicon()
         self.setup_ui()
+        self.update_work_end_time()
+        self.update_rest_end_time()
         self.setup_connections()
+        self.timeFormat = "hh:mm:ss"
         self.time = QTime(0,0,0,0)
-        self.workEndTime = QTime(0,25,0,0)
-        self.restEndTime = QTime(0,5,0,0)
+        self.workTime = QTime(0,0,0,0)
+        self.restTime = QTime(0,0,0,0)
+        self.totalTime = QTime(0,0,0,0)
         self.currentMode = Mode.work
         self.maxRepetitions = -1
         self.currentRepetitions = 0
@@ -62,6 +61,23 @@ class MainWindow(QMainWindow):
     def leaveEvent(self, event):
         super(MainWindow, self).leaveEvent(event)
         self.tasksTableWidget.clearSelection()
+
+    def closeEvent(self, event):
+        super(MainWindow, self).closeEvent(event)
+        settings = QSettings()
+        settings.setValue("timer/work/hours",    self.workHoursSpinBox.value())
+        settings.setValue("timer/work/minutes",  self.workMinutesSpinBox.value())
+        settings.setValue("timer/work/seconds", self.workSecondsSpinBox.value())
+        settings.setValue("timer/rest/hours",    self.restHoursSpinBox.value())
+        settings.setValue("timer/rest/minutes",  self.restMinutesSpinBox.value())
+        settings.setValue("timer/rest/seconds", self.restSecondsSpinBox.value())
+
+        tasks = []
+        for i in range(self.tasksTableWidget.rowCount()):
+            item = self.tasksTableWidget.item(i,0)
+            if not item.font().strikeOut():
+                tasks.append(item.text())
+        settings.setValue("tasks/tasks", tasks)
 
 
     def reset_time(self):
@@ -117,6 +133,11 @@ class MainWindow(QMainWindow):
 
     def update_time(self):
         self.time = self.time.addSecs(1)
+        self.totalTime = self.totalTime.addSecs(1)
+        if self.modeComboBox.currentText() == "work":
+            self.workTime = self.workTime.addSecs(1)
+        else:
+            self.restTime = self.restTime.addSecs(1)
         self.display_time()
 
     def update_max_repetitions(self, value):
@@ -142,17 +163,20 @@ class MainWindow(QMainWindow):
 
     def increment_current_repetitions(self):
         if self.maxRepetitions > 0:
-            self.currentRepetitions +=1
-            
+            self.currentRepetitions +=1  
 
     def insert_task(self):
-        taskDescription = self.taskTextEdit.toPlainText()
-        if taskDescription:
-            rowCount = self.tasksTableWidget.rowCount()
-            self.tasksTableWidget.setRowCount(rowCount + 1)
-            self.tasksTableWidget.setItem(rowCount, 0, QTableWidgetItem(taskDescription))
-            self.tasksTableWidget.resizeRowsToContents()
-            self.taskTextEdit.clear()
+        task = self.taskTextEdit.toPlainText()
+        self.insert_tasks(task)
+    
+    def insert_tasks(self, *tasks):
+        for task in tasks:
+            if task:
+                rowCount = self.tasksTableWidget.rowCount()
+                self.tasksTableWidget.setRowCount(rowCount + 1)
+                self.tasksTableWidget.setItem(rowCount, 0, QTableWidgetItem(task))
+                self.tasksTableWidget.resizeRowsToContents()
+                self.taskTextEdit.clear()
 
     def delete_task(self):
         selectedIndexes = self.tasksTableWidget.selectedIndexes()
@@ -166,7 +190,11 @@ class MainWindow(QMainWindow):
         item.setFont(font)
    
     def display_time(self):
-        self.timeDisplay.display(self.time.toString("hh:mm:ss"))
+        self.timeDisplay.display(self.time.toString(self.timeFormat))
+        self.statisticsRestTimeDisplay.display(self.restTime.toString(self.timeFormat))
+        self.statisticsWorkTimeDisplay.display(self.workTime.toString(self.timeFormat))
+        self.statisticsTotalTimeDisplay.display(self.totalTime.toString(self.timeFormat))
+
 
     def show_window_message(self, status):
         if status is Status.workFinished:
@@ -212,6 +240,8 @@ class MainWindow(QMainWindow):
 
 
     def setup_ui(self):
+        settings = QSettings()
+
         self.size_policy = sizePolicy=QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         #TABWIDGET
         self.tabWidget = QTabWidget()
@@ -224,9 +254,9 @@ class MainWindow(QMainWindow):
         self.workGroupBox = QGroupBox("Work")
         self.workGroupBoxLayout = QHBoxLayout(self.workGroupBox)
         self.workGroupBox.setLayout(self.workGroupBoxLayout)
-        self.workHoursSpinBox = QSpinBox(minimum=0, maximum=24, value=0, suffix="h", sizePolicy=self.size_policy)
-        self.workMinutesSpinBox = QSpinBox(minimum=0, maximum=60, value=25, suffix="m",sizePolicy=self.size_policy)
-        self.workSecondsSpinBox = QSpinBox(minimum=0, maximum=60, value=0, suffix="s",sizePolicy=self.size_policy)
+        self.workHoursSpinBox = QSpinBox(minimum=0, maximum=24, value=settings.value("timer/work/hours", 0), suffix="h", sizePolicy=self.size_policy)
+        self.workMinutesSpinBox = QSpinBox(minimum=0, maximum=60, value=settings.value("timer/work/minutes", 25), suffix="m",sizePolicy=self.size_policy)
+        self.workSecondsSpinBox = QSpinBox(minimum=0, maximum=60, value=settings.value("timer/work/seconds", 0), suffix="s",sizePolicy=self.size_policy)
         self.workGroupBoxLayout.addWidget(self.workHoursSpinBox)
         self.workGroupBoxLayout.addWidget(self.workMinutesSpinBox)
         self.workGroupBoxLayout.addWidget(self.workSecondsSpinBox)
@@ -234,9 +264,9 @@ class MainWindow(QMainWindow):
         self.restGroupBox = QGroupBox("Rest")
         self.restGroupBoxLayout = QHBoxLayout(self.restGroupBox)
         self.restGroupBox.setLayout(self.restGroupBoxLayout)
-        self.restHoursSpinBox = QSpinBox(minimum=0, maximum=24, value=0, suffix="h",sizePolicy=self.size_policy)
-        self.restMinutesSpinBox = QSpinBox(minimum=0, maximum=60, value=5, suffix="m",sizePolicy=self.size_policy)
-        self.restSecondsSpinBox = QSpinBox(minimum=0, maximum=60, value=0, suffix="s",sizePolicy=self.size_policy)
+        self.restHoursSpinBox = QSpinBox(minimum=0, maximum=24, value=settings.value("timer/rest/hours", 0), suffix="h",sizePolicy=self.size_policy)
+        self.restMinutesSpinBox = QSpinBox(minimum=0, maximum=60, value=settings.value("timer/rest/minutes", 5), suffix="m",sizePolicy=self.size_policy)
+        self.restSecondsSpinBox = QSpinBox(minimum=0, maximum=60, value=settings.value("timer/rest/seconds", 0), suffix="s",sizePolicy=self.size_policy)
         self.restGroupBoxLayout.addWidget(self.restHoursSpinBox)
         self.restGroupBoxLayout.addWidget(self.restMinutesSpinBox)
         self.restGroupBoxLayout.addWidget(self.restSecondsSpinBox)
@@ -308,12 +338,50 @@ class MainWindow(QMainWindow):
         self.tasksTableWidget.setTextElideMode(Qt.ElideNone)
         self.tasksTableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.tasksTableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.insert_tasks(*settings.value("tasks/tasks", []))
+
 
         self.tasksWidgetLayout.addWidget(self.inputWidget)
         self.tasksWidgetLayout.addWidget(self.tasksTableWidget)
-        #ADD TASKS
+        #CREATE STATISTICS TAB
+        self.statisticsWidget = QWidget()
+        self.statisticsWidgetLayout = QVBoxLayout(self.statisticsWidget)
+        self.statisticsWidget.setLayout(self.statisticsWidgetLayout)
+
+        self.statisticsWorkTimeGroupBox = QGroupBox("Work Time")
+        self.statisticsWorkTimeGroupBoxLayout = QHBoxLayout()
+        self.statisticsWorkTimeGroupBox.setLayout(self.statisticsWorkTimeGroupBoxLayout)
+        self.statisticsWorkTimeDisplay  = QLCDNumber(8)
+        self.statisticsWorkTimeDisplay.display("00:00:00")
+        self.statisticsWorkTimeGroupBoxLayout.addWidget(self.statisticsWorkTimeDisplay)
+
+        self.statisticsRestTimeGroupBox = QGroupBox("Rest Time")
+        self.statisticsRestTimeGroupBoxLayout = QHBoxLayout()
+        self.statisticsRestTimeGroupBox.setLayout(self.statisticsRestTimeGroupBoxLayout)
+        self.statisticsRestTimeDisplay  = QLCDNumber(8)
+        self.statisticsRestTimeDisplay.display("00:00:00")
+        self.statisticsRestTimeGroupBoxLayout.addWidget(self.statisticsRestTimeDisplay)
+
+        self.statisticsTotalTimeGroupBox = QGroupBox("Total Time")
+        self.statisticsTotalTimeGroupBoxLayout = QHBoxLayout()
+        self.statisticsTotalTimeGroupBox.setLayout(self.statisticsTotalTimeGroupBoxLayout)
+        self.statisticsTotalTimeDisplay  = QLCDNumber(8)
+        self.statisticsTotalTimeDisplay.display("00:00:00")
+        self.statisticsTotalTimeGroupBoxLayout.addWidget(self.statisticsTotalTimeDisplay)
+       
+        self.statisticsWidgetLayout.addWidget(self.statisticsTotalTimeGroupBox)
+        self.statisticsWidgetLayout.addWidget(self.statisticsWorkTimeGroupBox)
+        self.statisticsWidgetLayout.addWidget(self.statisticsRestTimeGroupBox)
+
+
+        #ADD TABS
         self.timerTab = self.tabWidget.addTab(self.pomodoroWidget, QIcon("icons/timer.png"), "Timer")
         self.tasksTab = self.tabWidget.addTab(self.tasksWidget, QIcon("icons/tasks.png"), "Tasks")
+        self.statisticsTab = self.tabWidget.addTab(self.statisticsWidget, QIcon("icons/statistics.png"), "Statistics")
+
+
+
+
         self.setCentralWidget(self.tabWidget)
     
     def make_round_button(self, path, text, disabled=True):
