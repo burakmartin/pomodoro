@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # SPDX-License-Identifier: GPL-3.0-or-later (see AUTHORS file)
-from PyQt5.QtCore import Qt, QTime, QTimer, QSettings
+from PyQt5.QtCore import Qt, QTime, QTimer, QSettings, QDir, QFileInfo
 from PyQt5.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -117,13 +117,13 @@ class MainWindow(QMainWindow):
         statisticsWidget = self.setupStatisticsTab()
         """ add tab widgets to tabwidget"""
         self.timerTab = self.tabWidget.addTab(
-            timerWidget, QIcon("icons/timer.png"), "Timer"
+            timerWidget, makeIcon("timer"), "Timer"
         )
         self.tasksTab = self.tabWidget.addTab(
-            tasksWidget, QIcon("icons/tasks.png"), "Tasks"
+            tasksWidget, makeIcon("tasks"), "Tasks"
         )
         self.statisticsTab = self.tabWidget.addTab(
-            statisticsWidget, QIcon("icons/statistics.png"), "Statistics"
+            statisticsWidget, makeIcon("statistics"), "Statistics"
         )
         """ Set mainwindows central widget """
         self.setCentralWidget(self.tabWidget)
@@ -256,8 +256,8 @@ class MainWindow(QMainWindow):
         self.inputButtonContainerLayout.setContentsMargins(0, 0, 0, 0)
         self.inputButtonContainer.setLayout(self.inputButtonContainerLayout)
         """ Create buttons """
-        self.acceptTaskButton = QToolButton(icon=QIcon("icons/check.png"))
-        self.deleteTaskButton = QToolButton(icon=QIcon("icons/trash.png"))
+        self.acceptTaskButton = QToolButton(icon=makeIcon("check"))
+        self.deleteTaskButton = QToolButton(icon=makeIcon("trash"))
         """ Create tasks tablewidget """
         self.tasksTableWidget = QTableWidget(0, 1)
         self.tasksTableWidget.setHorizontalHeaderLabels(["Tasks"])
@@ -314,10 +314,10 @@ class MainWindow(QMainWindow):
         return self.statisticsContainer
 
     def setupTrayicon(self):
-        self.trayIcon = QSystemTrayIcon(QIcon("icons/tomato.png"))
+        self.trayIcon = QSystemTrayIcon(makeIcon("tomato"))
         self.trayIcon.setContextMenu(QMenu())
         self.quitAction = self.trayIcon.contextMenu().addAction(
-            QIcon("icons/exit.png"), "Quit", self.exit
+            makeIcon("exit"), "Quit", self.exit
         )
         self.quitAction.triggered.connect(self.exit)
         self.trayIcon.activated.connect(self.onActivate)
@@ -485,22 +485,22 @@ class MainWindow(QMainWindow):
     def showWindowMessage(self, status):
         if status is Status.workFinished:
             self.trayIcon.showMessage(
-                "Break", choice(work_finished_phrases), QIcon("icons/tomato.png")
+                "Break", choice(work_finished_phrases), makeIcon("tomato")
             )
         elif status is Status.restFinished:
             self.trayIcon.showMessage(
-                "Work", choice(rest_finished_phrases), QIcon("icons/tomato.png")
+                "Work", choice(rest_finished_phrases), makeIcon("tomato")
             )
         else:
             self.trayIcon.showMessage(
-                "Finished", choice(pomodoro_finished_phrases), QIcon("icons/tomato.png")
+                "Finished", choice(pomodoro_finished_phrases), makeIcon("tomato")
             )
             self.resetButton.click()
 
-    def makeButton(self, text, iconPath=None, disabled=True):
+    def makeButton(self, text, iconName=None, disabled=True):
         button = QPushButton(text, sizePolicy=self.size_policy)
-        if iconPath:
-            button.setIcon(QIcon(iconPath))
+        if iconName:
+            button.setIcon(makeIcon(iconName))
         button.setDisabled(disabled)
         return button
 
@@ -515,6 +515,12 @@ class MainWindow(QMainWindow):
             self.show()
 
 
+def makeIcon(name, end="png"):
+    iconPath = QFileInfo(__file__).dir()
+    iconPath.cd("icons")
+    iconPath = iconPath.filePath(f"{name}.{end}")
+    return QIcon(iconPath)
+
 def makeApp():
     try:
         from PyQt5.QtWinExtras import QtWin
@@ -525,11 +531,13 @@ def makeApp():
 
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
-    app.setWindowIcon(QIcon("icons/tomato.png"))
+    app.setWindowIcon(makeIcon("tomato"))
     app.setApplicationName("Pomodoro")
     app.setOrganizationName("Burak Martin")
     app.setOrganizationDomain("https://github.com/burakmartin")
     return app
+
+
 
 
 if __name__ == "__main__":
