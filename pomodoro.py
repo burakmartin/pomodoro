@@ -80,9 +80,6 @@ class MainWindow(QMainWindow):
         settings.setValue("tasks/tasks", tasks)
 
 
-    def reset_time(self):
-        self.time = QTime(0,0,0,0)
-        self.display_time()
 
     def start_timer(self):
         try:
@@ -106,10 +103,11 @@ class MainWindow(QMainWindow):
         except:
             pass
 
-    def stop_timer(self):
+    def reset_timer(self):
         try:
             self.pause_timer()
-            self.reset_time()
+            self.time = QTime(0,0,0,0)
+            self.display_time()
         except:
             pass
 
@@ -149,13 +147,13 @@ class MainWindow(QMainWindow):
 
     def maybe_change_mode(self):
         if self.currentMode is Mode.work and self.time >= self.workEndTime:
-            self.stop_timer()
+            self.reset_timer()
             self.modeComboBox.setCurrentIndex(1)
             self.increment_current_repetitions()
             started = self.maybe_start_timer()
             self.show_window_message(Status.workFinished if started else Status.repetitionsReached)
         elif self.currentMode is Mode.rest and self.time >= self.restEndTime:
-            self.stop_timer()
+            self.reset_timer()
             self.modeComboBox.setCurrentIndex(0)
             self.increment_current_repetitions()
             started = self.maybe_start_timer()
@@ -203,24 +201,24 @@ class MainWindow(QMainWindow):
            self.trayIcon.showMessage("Work", choice(rest_finished_phrases), QIcon("icons/tomato.png"))
         else:
             self.trayIcon.showMessage("Finished", choice(pomodoro_finished_phrases), QIcon("icons/tomato.png"))
-            self.stopButton.click()
+            self.resetButton.click()
 
 
     def setup_connections(self):
         self.playButton.clicked.connect(self.start_timer)
         self.playButton.clicked.connect(lambda: self.playButton.setDisabled(True))
         self.playButton.clicked.connect(lambda: self.pauseButton.setDisabled(False))
-        self.playButton.clicked.connect(lambda: self.stopButton.setDisabled(False))
+        self.playButton.clicked.connect(lambda: self.resetButton.setDisabled(False))
 
         self.pauseButton.clicked.connect(self.pause_timer)
         self.pauseButton.clicked.connect(lambda: self.playButton.setDisabled(False))
         self.pauseButton.clicked.connect(lambda: self.pauseButton.setDisabled(True))
-        self.pauseButton.clicked.connect(lambda: self.stopButton.setDisabled(False))
+        self.pauseButton.clicked.connect(lambda: self.resetButton.setDisabled(False))
 
-        self.stopButton.clicked.connect(self.stop_timer)
-        self.stopButton.clicked.connect(lambda: self.playButton.setDisabled(False))
-        self.stopButton.clicked.connect(lambda: self.pauseButton.setDisabled(True))
-        self.stopButton.clicked.connect(lambda: self.stopButton.setDisabled(True))
+        self.resetButton.clicked.connect(self.reset_timer)
+        self.resetButton.clicked.connect(lambda: self.playButton.setDisabled(False))
+        self.resetButton.clicked.connect(lambda: self.pauseButton.setDisabled(True))
+        self.resetButton.clicked.connect(lambda: self.resetButton.setDisabled(True))
 
         self.workHoursSpinBox.valueChanged.connect(self.update_work_end_time)
         self.workMinutesSpinBox.valueChanged.connect(self.update_work_end_time)
@@ -296,12 +294,12 @@ class MainWindow(QMainWindow):
         self.buttonWidget = QWidget()
         self.buttonWidgetLayout = QHBoxLayout(self.buttonWidget)
         self.buttonWidget.setLayout(self.buttonWidgetLayout)
-        self.playButton = self.make_round_button("icons/play.png", "start", False)
-        self.stopButton = self.make_round_button("icons/stop.png", "stop")
-        self.pauseButton = self.make_round_button("icons/pause.png", "pause")
+        self.playButton = self.make_button("start", disabled=False)
+        self.resetButton = self.make_button("reset")
+        self.pauseButton = self.make_button("pause")
         self.buttonWidgetLayout.addWidget(self.pauseButton)
         self.buttonWidgetLayout.addWidget(self.playButton)
-        self.buttonWidgetLayout.addWidget(self.stopButton)
+        self.buttonWidgetLayout.addWidget(self.resetButton)
 
         #CENTRALWIDGET
         self.pomodoroWidgetLayout.addWidget(self.workGroupBox)
@@ -384,8 +382,10 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(self.tabWidget)
     
-    def make_round_button(self, path, text, disabled=True):
+    def make_button(self, text, iconPath=None, disabled=True):
         button = QPushButton(text, sizePolicy = self.size_policy)
+        if iconPath:
+            button.setIcon(QIcon(iconPath))
         button.setDisabled(disabled)
         return button
 
