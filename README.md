@@ -6,7 +6,7 @@ A small pomodoro GUI for Windows/Linux created with PyQt5.
 This section gives an overview on how to use the program.
 
 ### General
-Simply run python3 pomodoro.py to run the programm.
+Simply run python3 pomodoro.py to start the program.
 
 ### Windows
 You can create a executable file with pyinstaller. For that "pip install pyinstaller" and then run pyinstaller pomodoro.spec.
