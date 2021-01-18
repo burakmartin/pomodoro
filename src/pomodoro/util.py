@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later (see AUTHORS file)
+
 from PyQt5.QtCore import QFileInfo
 from PyQt5.QtGui import QIcon
 

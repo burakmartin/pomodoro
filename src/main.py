@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# SPDX-License-Identifier: GPL-3.0-or-later (see AUTHORS file)
+
 import sys
 from pomodoro import MainWindow, makeIcon
 from pomodoro import makeIcon
