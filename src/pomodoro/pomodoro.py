@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # SPDX-License-Identifier: GPL-3.0-or-later (see AUTHORS file)
-from PyQt5.QtCore import Qt, QTime, QTimer, QSettings, QDir, QFileInfo
+from PyQt5.QtCore import Qt, QTime, QTimer, QSettings, QDir
 from PyQt5.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -25,11 +25,12 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from PyQt5.QtGui import QIcon
-from qdarkstyle import load_stylesheet
 from enum import Enum
 from random import choice
-from const import *
+from .const import *
+from .util import makeIcon
+
+import sys
 
 
 class Mode(Enum):
@@ -509,36 +510,3 @@ class MainWindow(QMainWindow):
     def onActivate(self, reason):
         if reason == QSystemTrayIcon.Trigger:
             self.show()
-
-
-def makeIcon(name, end="png"):
-    iconPath = QFileInfo(__file__).dir()
-    iconPath.cd("icons")
-    iconPath = iconPath.filePath(f"{name}.{end}")
-    return QIcon(iconPath)
-
-
-def makeApp():
-    try:
-        from PyQt5.QtWinExtras import QtWin
-
-        QtWin.setCurrentProcessExplicitAppUserModelID(APP_ID)
-    except:
-        pass
-
-    app = QApplication(sys.argv)
-    app.setQuitOnLastWindowClosed(False)
-    app.setWindowIcon(makeIcon("tomato"))
-    app.setApplicationName("Pomodoro")
-    app.setOrganizationName("Burak Martin")
-    app.setOrganizationDomain("https://github.com/burakmartin")
-    return app
-
-
-if __name__ == "__main__":
-    import sys
-
-    app = makeApp()
-    app.setStyleSheet(load_stylesheet(qt_api="pyqt5"))
-    mainWindow = MainWindow()
-    sys.exit(app.exec_())

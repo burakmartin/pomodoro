@@ -14,15 +14,18 @@ excluded_binaries = [
         'Qt5Network.dll',
         'ucrtbase.dll']
 
-data_list = [('.\\pomodoro\\icons', 'icons\\'), 
-             ('.\\pomodoro\\const.py', '.'), 
+data_list = [('.\\src\\icons', '.\\icons'), 
+             ('.\\src\\pomodoro\\__init__.py', '.\\pomodoro'), 
+             ('.\\src\\pomodoro\\const.py', '.\\pomodoro'), 
+             ('.\\src\\pomodoro\\pomodoro.py', '.\\pomodoro'), 
+             ('.\\src\\pomodoro\\util.py', '.\\pomodoro'), 
              ('.\\LICENSE', '.'),
              ('.\\AUTHORS', '.'),
              ('.\\README.md', '.')]
 
 project_path = ['.']
 
-a = Analysis(['.\\pomodoro\\pomodoro.py'],
+a = Analysis(['.\\src\\main.py'],
              pathex=project_path,
              binaries=[],
              datas=data_list,
@@ -47,7 +50,7 @@ exe = EXE(pyz,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
-          console=False , icon='.\\pomodoro\\icons\\tomato.ico')
+          console=False , icon='.\\src\\icons\\tomato.ico')
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
