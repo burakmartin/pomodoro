@@ -11,7 +11,7 @@ for root, dirs, files in os.walk('src/pomodoro/data/'):
         os.path.join(root.replace('src/pomodoro/', ''), x) for x in files]
 
 setup(
-    version                       = "0.0.6",
+    version                       = "0.0.7",
     name                          = "pomodoro-gui",
     author                        = "Burak Martin",
     author_email                  = "burak.martin100@gmail.com",
