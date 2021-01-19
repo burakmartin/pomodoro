@@ -56,14 +56,14 @@ class MainWindow(QMainWindow):
     def setupVariables(self):
         settings = QSettings()
         self.workEndTime = QTime(
-            settings.value(workHoursKey, 0),
-            settings.value(workMinutesKey, 25),
-            settings.value(workSecondsKey, 0),
+            int(settings.value(workHoursKey, 0)),
+            int(settings.value(workMinutesKey, 25)),
+            int(settings.value(workSecondsKey, 0)),
         )
         self.restEndTime = QTime(
-            settings.value(restHoursKey, 0),
-            settings.value(restMinutesKey, 5),
-            settings.value(restSecondsKey, 0),
+            int(settings.value(restHoursKey, 0)),
+            int(settings.value(restMinutesKey, 5)),
+            int(settings.value(restSecondsKey, 0)),
         )
         self.timeFormat = "hh:mm:ss"
         self.time = QTime(0, 0, 0, 0)
@@ -136,21 +136,21 @@ class MainWindow(QMainWindow):
         self.workHoursSpinBox = QSpinBox(
             minimum=0,
             maximum=24,
-            value=settings.value(workHoursKey, 0),
+            value=int(settings.value(workHoursKey, 0)),
             suffix="h",
             sizePolicy=self.size_policy,
         )
         self.workMinutesSpinBox = QSpinBox(
             minimum=0,
             maximum=60,
-            value=settings.value(workMinutesKey, 25),
+            value=int(settings.value(workMinutesKey, 25)),
             suffix="m",
             sizePolicy=self.size_policy,
         )
         self.workSecondsSpinBox = QSpinBox(
             minimum=0,
             maximum=60,
-            value=settings.value(workSecondsKey, 0),
+            value=int(settings.value(workSecondsKey, 0)),
             suffix="s",
             sizePolicy=self.size_policy,
         )
@@ -161,21 +161,21 @@ class MainWindow(QMainWindow):
         self.restHoursSpinBox = QSpinBox(
             minimum=0,
             maximum=24,
-            value=settings.value(restHoursKey, 0),
+            value=int(settings.value(restHoursKey, 0)),
             suffix="h",
             sizePolicy=self.size_policy,
         )
         self.restMinutesSpinBox = QSpinBox(
             minimum=0,
             maximum=60,
-            value=settings.value(restMinutesKey, 5),
+            value=int(settings.value(restMinutesKey, 5)),
             suffix="m",
             sizePolicy=self.size_policy,
         )
         self.restSecondsSpinBox = QSpinBox(
             minimum=0,
             maximum=60,
-            value=settings.value(restSecondsKey, 0),
+            value=int(settings.value(restSecondsKey, 0)),
             suffix="s",
             sizePolicy=self.size_policy,
         )
