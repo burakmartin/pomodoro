@@ -12,7 +12,7 @@ for root, dirs, files in os.walk('src/pomodoro/data/'):
 
 setup(
     version                       = "0.0.6",
-    name                          = "Pomodoro",
+    name                          = "pomodoro-gui",
     author                        = "Burak Martin",
     author_email                  = "burak.martin100@gmail.com",
     url                           = "https://github.com/burakmartin/pomodoro",
