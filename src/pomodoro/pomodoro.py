@@ -28,7 +28,7 @@ from enum import Enum
 from random import choice
 from .const import *
 from .util import makeIcon
-
+from qdarkstyle import load_stylesheet
 import sys
 
 
@@ -509,3 +509,23 @@ class MainWindow(QMainWindow):
     def onActivate(self, reason):
         if reason == QSystemTrayIcon.Trigger:
             self.show()
+
+def makeApp():
+    try:
+        from PyQt5.QtWinExtras import QtWin
+        QtWin.setCurrentProcessExplicitAppUserModelID(APP_ID)
+    except:
+        pass
+    app = QApplication(sys.argv)
+    app.setQuitOnLastWindowClosed(False)
+    app.setWindowIcon(makeIcon("tomato"))
+    app.setApplicationName("Pomodoro")
+    app.setOrganizationName("Burak Martin")
+    app.setOrganizationDomain("https://github.com/burakmartin")
+    return app
+
+def main():
+    app = makeApp()
+    app.setStyleSheet(load_stylesheet(qt_api="pyqt5"))
+    mainWindow = MainWindow()
+    sys.exit(app.exec_())
