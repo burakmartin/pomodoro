@@ -34,29 +34,18 @@ To quit it, right click the tomato icon in your traysystem and press the quit bu
 This section gives an overview on how to use the program.
 
 ### General
-1. Install dependencies
+1. Install
 
-    pip3 install -r requirements.txt
+    pip install pomodoro-gui
 
 2. Run
 
-    python3 src/main.py
-
-OR 
-
-1. Install via setup.py
-
-    pip3 install .
-
-2. Run the program
-
-  pomodoro
-
+    pomodoro
 
 ### Executable (Windows only)
 1. Install pyinstaller
 
-    pip3 install pyinstaller
+    pip install pyinstaller
 
 2. Create executable file
 
