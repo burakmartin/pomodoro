@@ -42,6 +42,17 @@ This section gives an overview on how to use the program.
 
     python3 src/main.py
 
+OR 
+
+1. Install via setup.py
+
+    pip3 install .
+
+2. Run the program
+
+  pomodoro
+
+
 ### Executable (Windows only)
 1. Install pyinstaller
 
