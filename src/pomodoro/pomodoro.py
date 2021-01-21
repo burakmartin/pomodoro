@@ -46,7 +46,6 @@ class Status(Enum):
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
-        settings = QSettings()
         self.setupTrayicon()
         self.setupVariables()
         self.setupUi()
@@ -186,7 +185,7 @@ class MainWindow(QMainWindow):
         self.otherGroupBox = QGroupBox("Other")
         self.otherGroupBoxLayout = QHBoxLayout(self.otherGroupBox)
         self.otherGroupBox.setLayout(self.otherGroupBoxLayout)
-        self.repetitionsLabel = QLabel("Repetitions", sizePolicy=self.size_policy)
+        self.repetitionsLabel = QLabel("Repetitions")
         self.repetitionsSpinBox = QSpinBox(
             minimum=0,
             maximum=10000,
@@ -194,8 +193,8 @@ class MainWindow(QMainWindow):
             sizePolicy=self.size_policy,
             specialValueText="∞",
         )
-        self.modeLabel = QLabel("Mode", sizePolicy=self.size_policy)
-        self.modeComboBox = QComboBox()
+        self.modeLabel = QLabel("Mode")
+        self.modeComboBox = QComboBox(sizePolicy=self.size_policy)
         self.modeComboBox.addItems(["work", "rest"])
         self.otherGroupBoxLayout.addWidget(self.repetitionsLabel)
         self.otherGroupBoxLayout.addWidget(self.repetitionsSpinBox)
